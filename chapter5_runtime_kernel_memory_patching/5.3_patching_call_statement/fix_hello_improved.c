@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	/* Calculate the call statement operand */
 	/* call_operand = address_of_uprintf - address_of_instruction_after_callq
 	 * 		= address_of_uprintf - <hello+0xf6> */
-	/* 4 */
+	/* The address we jump to has to be relative, so we subtract the address of the instruction after callq from the address of uprintf */
 	*(unsigned long *)&call_operand[0] = nl[1].n_value - (nl[0].n_value + call_offset + 5);
 
 	/* Patch hello */
