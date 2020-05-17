@@ -23,6 +23,8 @@ sc_example(struct thread *td, void *syscall_args)
 	uap = (struct sc_example_args *) syscall_args;
 
 	/* print the string argument passed to the syscall function */
+	/* printf will print to the kernel buffer (read via dmesg) */
+	/* uprintf will print to STDOUT */
 	printf("%s\n", uap->str);
 
 	return(0);
