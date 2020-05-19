@@ -10,11 +10,12 @@
 #include <sys/types.h>
 #include <sys/module.h>
 
-/* kernel memory allocation (kmalloc) function code */
-/* This is from the disassembly of kmalloc.ko 
+/* kernel memory allocation (kmalloc) function code
+ * This is from the disassembly of kmalloc.ko 
  * Note that there are 6 addresses at offsets 78, 88, 139, 159, 169, and 217 
  * that are currently set to \x00\x00\x00\x00. This is because they are
- * relative jumps that we need to calculate and overwrite at runtime. */
+ * relative jumps that we need to calculate and overwrite at runtime. 
+ */
 unsigned char kmalloc[] =
 	"\x55"                   	/* push   %rbp			*/
 	"\x48\x89\xe5"             	/* mov    %rsp,%rbp		*/
