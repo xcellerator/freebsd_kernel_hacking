@@ -98,16 +98,16 @@ unsigned char kmalloc[] =
 /* "Hello, world!\n" funcion code */
 /* We will overwrite the two 8-bytes of \x00 with the correct addresses later */
 unsigned char hello[] =
-	"Hello, world!\n\x00"						/* Hello, world!\n	*/
-	"\x50"								/* push %rax		*/
-	"\x56"								/* push %rsi		*/
-	"\x57"								/* push %rdi		*/
-	"\x48\xbf\x00\x00\x00\x00\x00\x00\x00\x00"			/* mov 0x0,%rdi		*/
-	"\x48\xb8\x00\x00\x00\x00\x00\x00\x00\x00"			/* mov 0x0,%rax		*/
-	"\xff\xd0"							/* call %rax		*/
-	"\x5f"								/* pop %rdi		*/
-	"\x5e"								/* pop %rsi		*/
-	"\x58";								/* pop %rax		*/
+	"Hello, world!\n\x00"				/* Hello, world!\n	*/
+	"\x50"						/* push %rax		*/
+	"\x56"						/* push %rsi		*/
+	"\x57"						/* push %rdi		*/
+	"\x48\xbf\x00\x00\x00\x00\x00\x00\x00\x00"	/* mov 0x0,%rdi		*/
+	"\x48\xb8\x00\x00\x00\x00\x00\x00\x00\x00"	/* mov 0x0,%rax		*/
+	"\xff\xd0"					/* call %rax		*/
+	"\x5f"						/* pop %rdi		*/
+	"\x5e"						/* pop %rsi		*/
+	"\x58";						/* pop %rax		*/
 
 /* The relative address of the instruction following the call uprintf
  * statement with hello */
@@ -117,8 +117,8 @@ unsigned char hello[] =
 /* Unconditional jump code */
 /* We will overwrite \x00*8 with the correct address later */
 unsigned char jump[] =
-	"\x48\xb8\x00\x00\x00\x00\x00\x00\x00\x00"			/* mov $0x0,%rax*/
-	"\xff\xe0";							/* jmp *%rax 	*/
+	"\x48\xb8\x00\x00\x00\x00\x00\x00\x00\x00"	/* mov $0x0,%rax*/
+	"\xff\xe0";					/* jmp *%rax 	*/
 
 int main (int argc, char *argv[])
 {
@@ -138,6 +138,7 @@ int main (int argc, char *argv[])
 		exit(-1);
 	}
 
+	/* Names of all the relocatable symbols that we need to patch in */
 	nl[0].n_name = "sys_mkdir";
 	nl[1].n_name = "M_TEMP";
 	nl[2].n_name = "malloc";
@@ -145,7 +146,7 @@ int main (int argc, char *argv[])
 	nl[4].n_name = "copyout";
 	nl[5].n_name = "uprintf";
 
-	/* Find the address of sys_mkdir, M_TEMP, malloc, memset, copyout, and uprintf */
+	/* Find the address of all the relocatable symbols we need */
 	if (kvm_nlist(kd, nl) < 0)
 	{
 		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
@@ -179,12 +180,14 @@ int main (int argc, char *argv[])
 	}
 
 	/* Determine how much memory we need to allocate */
-	size = (unsigned long)(sizeof(hello)-1) + (unsigned long)call_offset + (unsigned long)(sizeof(jump)-1);
+	size = (unsigned long)(sizeof(hello)-1) 
+		+ (unsigned long)call_offset 
+		+ (unsigned long)(sizeof(jump)-1);
 
-	/*
-	 * Patch the kmalloc function code to contain the correct addresses
-	 * for M_TEMP, malloc, copyout, and memset.
-	 */
+	/* Patch the kmalloc function code to contain the correct addresses
+	 * for M_TEMP, malloc, copyout, and memset. Offsets found by inspecting
+	 * disassembly. */
+
 	/* M_TEMP */
 	*(unsigned int *)&kmalloc[78] = nl[1].n_value;
 	/* malloc */
@@ -205,9 +208,7 @@ int main (int argc, char *argv[])
 		exit(-1);
 	}
 	else
-	{
 		printf("[*] Wrote 0x%x bytes of kmalloc to 0x%x\n", sizeof(kmalloc), (long)nl[0].n_value);
-	}
 
 	/* Allocate kernel memory */
 	syscall(136, size, &addr);
@@ -220,42 +221,29 @@ int main (int argc, char *argv[])
 		exit(-1);
 	}
 	else
-	{
 		printf("[*] Wrote 0x%x bytes of sys_mkdir to 0x%x\n", sizeof(kmalloc), (long)nl[0].n_value);
-	}
 
-	/*
-	 * Patch the "Hello, world!\n" function code to contain the correct
-	 * addresses for the "Hello, world!\n" string and uprintf.
-	 */
-	printf("\n");
-	printf("[D]	uprintf addr 		= 0x%x\n", nl[5].n_value);
-	printf("[D]	addr + H_OFFSET_1	= 0x%x\n", addr + H_OFFSET_1);
-	printf("[D]	uprintf (relative) 	= 0x%x\n", nl[5].n_value - (addr + H_OFFSET_1));
-	printf("\n");
+	/* Patch the "Hello, world!\n" function code to contain the correct
+	 * addresses for the "Hello, world!\n" string and uprintf. 
+	 * Offsets found by inspecting hello[]. */
 
 	/* Kernel Memory Address */
 	*(unsigned long *)&hello[20] = addr;
 	/* uprintf */
 	*(unsigned long *)&hello[30] = nl[5].n_value;
 
-	/*
-	 * Place the "Hello, world!\n" function code into the allocated kernel memory
-	 */
+
+	/* Place the "Hello, world!\n" function code into the allocated kernel memory */
 	if (kvm_write(kd, addr, hello, sizeof(hello)) < 0 )
 	{
 		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
 		exit(-1);
 	}
 	else
-	{
 		printf("[>] Copied hello to kernel memory address 0x%x (0x%x bytes)\n", (long)addr, sizeof(hello));
-	}
 
-	/*
-	 * Place the sys_mkdir code up to but not including the call to kern_mkdirat
-	 * after the "Hello, world!\n" function code
-	 */
+	/* Place the sys_mkdir code (up to but not including the call to kern_mkdirat)
+	 * after the "Hello, world!\n" function code */
 	if (kvm_write(kd, addr + (unsigned long)sizeof(hello) - 1, mkdir_code, call_offset) < 0)
 	{
 		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
@@ -264,15 +252,13 @@ int main (int argc, char *argv[])
 	else
 		printf("[>] Copied sys_mkdir (up to call kern_mkdirat) to kernel memory address 0x%x (0x%x bytes)\n", (long)(addr + sizeof(hello) - 1), call_offset);
 
-	/*
-	 * Patch the unconditional jump code to jump back to the call kern_mkdirat statement within mkdir 
-	 */
+
+	/* Patch the unconditional jump code to jump back to the call kern_mkdirat 
+	 * statement within mkdir */
 	*(unsigned long *)&jump[2] = nl[0].n_value + (unsigned int)call_offset;
 
-	/*
-	 * Place the unconditional jump code into the recently allocated kernel memory,
-	 * after the mkdir code
-	 */
+	/* Place the unconditional jump code into the recently allocated kernel memory,
+	 * after the mkdir code */
 	if (kvm_write(kd, addr + (unsigned long)sizeof(hello) - 1 + (unsigned long)call_offset, jump, sizeof(jump)) < 0)
 	{
 		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
@@ -281,41 +267,19 @@ int main (int argc, char *argv[])
 	else
 		printf("[>] Copied jump to kernel memory address 0x%x (0x%x bytes)\n", (long)(addr + sizeof(hello) - 1 + call_offset), sizeof(jump));
 
-	/* Test the memory copied to kernel code */
-	if (kvm_read(kd, addr, test_buf, size) < 0)
-	{
-		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
-		exit(-1);
-	}
-	else
-	{
-		printf("[D] test_buf = ", size, addr);
-		for ( int i = 0 ; i < size ; i++ )
-			printf("%02hhx ", test_buf[i]);
-		printf("\n");
-	}
-
-	/*
-	 * Patch the unconditional jump code to jump to the start of the 
+	/* Patch the unconditional jump code to jump to the start of the 
 	 * "Hello, world!\n" function code
-	 */
-	/* Skip over 0x0f bytes of the "Hello, world!\n" string at the top of hello */
+	 * Skip over 0xf bytes of the "Hello, world!\n" string at the top of hello */
 	*(unsigned long *)&jump[2] = addr + 0xf;
-	printf("[D] jump = ");
-	for ( int i = 0 ; i < sizeof(jump)-1 ; i++ )
-		printf("%02hhx ", jump[i]);
-	printf("\n");
 
-	/*
-	 * Overwrite the beginning of sys_mkdir with the unconditional jump code
-	 */
+	/* Overwrite the beginning of sys_mkdir with the unconditional jump code */
 	if (kvm_write(kd, nl[0].n_value, jump, sizeof(jump)) < 0)
 	{
 		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
 		exit(-1);
 	}
 	else
-		printf("[>] Wrote jump to beginning of \"sys_mkdir\" (0x%x)\n", (long)nl[0].n_value);
+		printf("[*] Wrote jump to beginning of \"sys_mkdir\" (0x%x)\n", (long)nl[0].n_value);
 
 	/* Close kd */
 	if (kvm_close(kd) < 0)
