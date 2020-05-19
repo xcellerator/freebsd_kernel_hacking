@@ -117,8 +117,8 @@ unsigned char hello[] =
 /* Unconditional jump code */
 /* We will overwrite \x00*8 with the correct address later */
 unsigned char jump[] =
-	"\x48\xb8\x00\x00\x00\x00\x00\x00\x00\x00"			/* mov $0x0,%rax */
-	"\xff\xe0";							/* jmp *%rax */
+	"\x48\xb8\x00\x00\x00\x00\x00\x00\x00\x00"			/* mov $0x0,%rax*/
+	"\xff\xe0";							/* jmp *%rax 	*/
 
 int main (int argc, char *argv[])
 {
