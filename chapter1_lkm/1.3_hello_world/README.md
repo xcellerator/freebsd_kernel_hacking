@@ -13,4 +13,4 @@ This is the prototype for all kernel modules on FreeBSD.
 To use:
 * Compile with `make` (you'll need the FreeBSD source headers somewhere like `/usr/src`)
 * Load with `kldload ./hello.ko`
-* Unload with `kldunload hello.ko` 
+* Unload with `kldunload hello.ko`
