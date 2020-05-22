@@ -16,4 +16,4 @@ To use:
 * Load with `kldload ./cd_example.ko`
 * Compile the userland program `interface` with `make`
 * Feed the syscall a string with `sudo ./interface Hello\ world`
-* Unload with `kldunload sc_example.ko`
+* Unload with `kldunload cd_example.ko`
