@@ -13,6 +13,6 @@ To use:
 * Load with `kldload ./process_hiding.ko`
 * In one tty, run `top`
 * In another, run `ps` and observe that `top` is in the list
-* Run `perl -e '$p="top";syscall(210,$p);'`
+* Run `./test.pl`
 * Run `ps` again and observe that `top` is now missing, despite still running!
 * Unload with `kldunload process_hiding.ko`
