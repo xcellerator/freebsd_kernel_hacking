@@ -8,6 +8,6 @@ This time we hook the `sys_read` syscall in order to log keystrokes. We have to 
 
 To use:
 * Compile with `make` (you'll need the FreeBSD source headers somewhere like `/usr/src`)
-* Load with `kldload ./readhook.ko`
+* Load with `kldload ./read_hook.ko`
 * Login to a new tty and check `dmesg`
 * Unload with `kldunload read_hook.ko`
