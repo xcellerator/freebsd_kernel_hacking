@@ -7,7 +7,7 @@
 Building on the technique in [Section 5.5](../5.5_userspace_kernel_memory_allocation), we can instead preserve the execution of `sys_mkdir` while also introducing new code - without ever loading a kernel module! We will hook `sys_mkdir` so that every time a new directory is created, the string "Hello, world!\n" will be printed to `STDOUT`.
 
 The technique is as follows:
-* Allocate a kernel buffer
+* Allocate a kernel buffer (see [Section 5.5](../5.5_userspace_kernel_memory_allocation))
   * Find the memory addresses of the the relocatable symbols and patch their addreses in the `kmalloc` assembly. (The offsets of these addreses are found by simply inspecting the assembly)
   * Save `sizeof(malloc)` bytes of the `sys_mkdir` syscall into a buffer for later
   * Overwrite `sys_mkdir` with the patched `kmalloc` code
