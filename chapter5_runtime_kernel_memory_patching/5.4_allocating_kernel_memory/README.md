@@ -2,7 +2,7 @@
 
 ## Chapter 5
 
-### Allocating Kernel Memory
+### 5.4: Allocating Kernel Memory
 
 Calling `malloc` from kernel space allows us to allocate kernel memory. This means that we can do much more than just patching bytes.
 

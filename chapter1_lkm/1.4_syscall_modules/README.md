@@ -2,7 +2,7 @@
 
 ## Chapter 1
 
-### System Calls
+### 1.4: System Calls
 
 Implement a new system call that just prings the argument passed to it to the kernel buffer.
 

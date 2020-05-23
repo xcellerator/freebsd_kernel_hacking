@@ -2,7 +2,7 @@
 
 ## Chapter 1
 
-### Hello, World
+### 1.3: Hello, World
 
 This is the prototype for all kernel modules on FreeBSD.
 

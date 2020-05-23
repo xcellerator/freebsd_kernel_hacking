@@ -2,7 +2,7 @@
 
 ## Chapter 1
 
-### Character Device
+### 1.6: Character Device
 
 Implement a character device that copies a string from userland into a buffer in kernel space.
 

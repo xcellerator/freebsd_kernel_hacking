@@ -2,7 +2,7 @@
 
 ## Chapter 2
 
-### Syscall Hooking
+### 2.1: Syscall Hooking
 
 Write a customized `sys_mkdir` syscall that outputs some extra information and overwrite the real `sys_mkdir`'s entry in the `sysent` structure with the syscall number of our new function. When we unload the module, we have to also write the original syscall number back.
 

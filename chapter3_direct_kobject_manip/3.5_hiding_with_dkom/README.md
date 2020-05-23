@@ -2,7 +2,7 @@
 
 ## Chapter 3
 
-### Hiding a Process with Direct Kernel Object Manipulation (DKOM)
+### 3.5: Hiding a Process with Direct Kernel Object Manipulation (DKOM)
 
 The purpose of this section was to fill in the rest of the gaps in [process_hiding_pidhashtbl.c](../3.4_hiding_a_process_redux/process_hiding_pidhashtbl.c) using all the cleanup functions in [sys/kern/kern_exit.c](https://github.com/freebsd/freebsd/blob/master/sys/kern/kern_exit.c) of the FreeBSD source code, i.e. use the actual source to mimic how FreeBSD cleans up after a process exits. In particulr, if our secret process had a parent, even after employing the previous methods, it would still exist in its parent's child list.
 

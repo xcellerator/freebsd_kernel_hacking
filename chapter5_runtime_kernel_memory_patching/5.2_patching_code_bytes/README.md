@@ -2,7 +2,7 @@
 
 ## Chapter 5
 
-### Patching Bytes of Kernel Memory
+### 5.2: Patching Bytes of Kernel Memory
 
 The syscall module `hello.ko` simply prints "FreeBSD Rocks!\n" 10 times to the kernel buffer and then a new line every time it's called. The `fix_hello.c` program patches the kernel module in memory by patching the `jmp` instruction in the for loop with `nop`s.
 

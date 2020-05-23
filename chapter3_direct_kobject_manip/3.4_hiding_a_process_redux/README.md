@@ -2,7 +2,7 @@
 
 ## Chapter 3
 
-### Hiding a Process Redux
+### 3.4: Hiding a Process Redux
 
 It turns out that FreeBSD also maintains a hash table of running processes to aid in lookups. Without also removing the process from this hashtable, it would be possible to examine this hash table and discover our secret process. For example, `ps -p <pid>` would return information about the secret process if we knew the correct PID. We can do this using the `LIST_REMOVE` macro as before.
 

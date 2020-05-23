@@ -2,7 +2,7 @@
 
 ## Chapter 5
 
-### Call Statement Patching
+### 5.3: Call Statement Patching
 
 In addition to [Section 5.2](../5.2_patching_code_bytes/), we can also patch the `printf` call to a call to `uprintf`, i.e. instead of printing to the kernel buffer, it will print the `STDOUT`.
 

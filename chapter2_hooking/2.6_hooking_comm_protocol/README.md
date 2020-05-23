@@ -2,7 +2,7 @@
 
 ## Chapter 2
 
-### Communication Protocol Hooking
+### 2.6: Communication Protocol Hooking
 
 We hook FreeBSD's ICMP packet handler in the network protocol swich table `inetsw`. The hook examines each ICMP packet for the trigger payload "Shiny.". If it finds it, it prints a message to the kernel buffer.
 

@@ -2,7 +2,7 @@
 
 ## Chapter 3
 
-### Hiding a Process
+### 3.3: Hiding a Process
 
 Using the `allproc` kernel object (a doubly-linked list), we can iterate through every running process on the system looking for a process with a specific name (which is passed as an argument to the syscall). When we find it, we can remove it from the the `allproc` list, hiding it from the system (it won't show up in `ps` or `top`). This doesn't affect the processes threads or execution in any way.
 

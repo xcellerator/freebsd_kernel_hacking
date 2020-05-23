@@ -2,7 +2,7 @@
 
 ## Chapter 3
 
-### Open TCP Port Hiding
+### 3.6: Open TCP Port Hiding
 
 Using a similar technique to hiding a process, we can also hide an open tcp port from programs like `netstat`. Instead of the `allproc` list, we target the `V_tcbinfo` list which contains information about all the open connections. In particular, the `V_tcbinfo.listhead` field is full of `inpcb` structs that are the actual entries for each connection. Taking a port number from the arguments passed to the syscall, we can loop through each of these structures with the `CK_LIST_FOREACH` macro, and simply remove it with `CK_LIST_REMOVE` when we get a match.
 
