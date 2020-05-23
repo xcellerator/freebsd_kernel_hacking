@@ -1,5 +1,3 @@
-/* Compile with the -lkvm GCC flag */
-
 #include <fcntl.h>
 #include <kvm.h>
 #include <limits.h>
