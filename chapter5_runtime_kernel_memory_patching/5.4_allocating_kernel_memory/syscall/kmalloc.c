@@ -28,7 +28,7 @@ static int kmalloc (struct thread *td, void *syscall_args)
 	 * M_TEMP = "miscellaneous data buffers" 
 	 * M_NOWAIT = malloc will retur NULL if the allocation can't be fulfilled immediately 
 	 * If successful, addr will contain the virtual address space that we've been allocated */
-	addr = (unsigned long) malloc( (u_long)(uap->size), M_TEMP, M_NOWAIT);
+	addr = (unsigned long) malloc( (u_long)(uap->size), M_TEMP, (M_NOWAIT | M_EXEC));
 	/* Copy the address of the kernel memory that we've been allocated to userspace
 	 * Note that addr is the address of the kernel memory that we've been allocated, but
 	 * uap->addr is the variable supplied as an argument by the syscall */
