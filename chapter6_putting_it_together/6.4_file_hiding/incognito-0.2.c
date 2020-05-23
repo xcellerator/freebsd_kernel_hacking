@@ -162,7 +162,7 @@ static int load (struct module *module, int cmd, void *arg)
 
 		case MOD_UNLOAD:
 			sysent[SYS_execve].sy_call = (sy_call_t *)sys_execve;
-			sysent[SYS_execve].sy_call = (sy_call_t *)sys_getdirentries;
+			sysent[SYS_getdirentries].sy_call = (sy_call_t *)sys_getdirentries;
 			break;
 
 		default:
