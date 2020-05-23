@@ -10,6 +10,6 @@ Calling `malloc` from kernel space allows us to allocate kernel memory. This mea
 
 To use:
 * Make and load the syscall module with `make; kldload kmalloc.ko`
-* Make and run the userland interface with `make; ./interface`
+* Make and run the userland interface with `make; ./interface 16`
 * Observe the address of the allocated memory returned to `STDOUT`
 * Unload the kernel module with `kldunload kmalloc.ko`
