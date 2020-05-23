@@ -1,5 +1,3 @@
-/* Compile with the -lkvm GCC flag */
-
 #include <fcntl.h>
 #include <kvm.h>
 #include <limits.h>
@@ -39,7 +37,7 @@ unsigned char kmalloc[] =
 	"\x48\x8b\x7d\xc8"          	/* mov    -0x38(%rbp),%rdi	*/
 	"\x48\xc7\xc6\x00\x00\x00\x00" 	/* mov    $0x0,%rsi		*/
 					/* (78) R_X86_64_32S	M_TEMP	*/
-	"\xba\x01\x00\x00\x00"       	/* mov    $0x1,%edx		*/
+	"\xba\x01\x40\x00\x00"       	/* mov    $0x4001,%edx		*/
 	"\xe8\x00\x00\x00\x00"       	/* callq  fc <kmalloc+0x5c>	*/
 					/* (88) R_X86_64_PLT32 malloc	*/
 	"\x48\x89\x45\xd0"          	/* mov    %rax,-0x30(%rbp)	*/
@@ -62,7 +60,7 @@ unsigned char kmalloc[] =
 	"\x48\x8b\x7d\xc8"          	/* mov    -0x38(%rbp),%rdi	*/
 	"\x48\xc7\xc6\x00\x00\x00\x00" 	/* mov    $0x0,%rsi		*/
 					/* (159) R_X86_64_32S M_TEMP	*/
-	"\xba\x01\x00\x00\x00"       	/* mov    $0x1,%edx		*/
+	"\xba\x01\x40\x00\x00"       	/* mov    $0x4001,%edx		*/
 	"\xe8\x00\x00\x00\x00"       	/* callq  14d <kmalloc+0xad>	*/
 					/* (169) R_X86_64_PLT32 malloc	*/
 	"\x48\x89\x45\xd0"          	/* mov    %rax,-0x30(%rbp)	*/
