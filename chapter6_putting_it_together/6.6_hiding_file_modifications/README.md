@@ -2,7 +2,7 @@
 
 ## Chapter 6
 
-### 6.6: Hiding File Modifications
+### 6.6: Hiding File Modifications *(IN PROGRESS)*
 
 The last issue with our rootkit is that we will still leave traces when we copy `trojan_hello` to `/sbin/` thanks to access, modification and change time updates.
 
