@@ -10,7 +10,7 @@ If we now look at [`ufs_itimes_locked.disas`](./ufs_itimes_locked.disas), at add
 
 The source code tells us that `DIP_SET` is used 7 times, so we are looking for a repeated instance of 7 blocks of assembly. These instances are prepended by `DIP> `. Fortunately for us, we only have to `nop` out the penultimate 3.
 
-> Note that in the final `DIP> ` instruction, we see that it's followed by an `addq` instruction, which matches the source code.
+> Note that in the final `DIP>` instruction, we see that it's followed by an `addq` instruction, which matches the source code.
 
 The instructions we have to `nop` out are:
 
