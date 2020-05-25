@@ -91,10 +91,13 @@ int main (int argc, char *argv[])
 		exit(-1);
 	}
 
-	time[0].tv_sec = sb.st_atime;
-	time[0].tv_usec = 0;
-	time[1].tv_sec = sb.st_mtime;
-	time[1].tv_usec = 0;
+	/* time[] is an array of timeval's, but stat returns timespec's
+	 * timespec = seconds + nanoseconds
+	 * timeval  = seconds + microseconds */
+	time[0].tv_sec 	= (time_t)sb.st_atim.tv_sec;
+	time[0].tv_usec	= (long)sb.st_atim.tv_nsec / 1000;
+	time[1].tv_sec 	= (time_t)sb.st_mtim.tv_sec;
+	time[1].tv_usec	= (long)sb.st_mtim.tv_nsec / 1000;
 
 	/* Patch ufs_itimes with nops */
 	if (kvm_write(kd, nl[0].n_value + offset1, nop4, sizeof(nop4)-1) < 0)
