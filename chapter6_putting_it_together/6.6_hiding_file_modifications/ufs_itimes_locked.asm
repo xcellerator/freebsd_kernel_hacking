@@ -1,60 +1,10 @@
-
-/boot/kernel/kernel:     file format elf64-x86-64-freebsd
-
-Disassembly of section .text:
-
-ffffffff80ef74c0 <ufs_itimes_locked>:
-ffffffff80ef74c0:	55                   	push   %rbp
-ffffffff80ef74c1:	48 89 e5             	mov    %rsp,%rbp
-ffffffff80ef74c4:	41 56                	push   %r14
-ffffffff80ef74c6:	53                   	push   %rbx
-ffffffff80ef74c7:	48 83 ec 10          	sub    $0x10,%rsp
-ffffffff80ef74cb:	48 89 fb             	mov    %rdi,%rbx
-ffffffff80ef74ce:	4c 8b 77 10          	mov    0x10(%rdi),%r14
-ffffffff80ef74d2:	49 8b 46 18          	mov    0x18(%r14),%rax
-ffffffff80ef74d6:	4c 89 f7             	mov    %r14,%rdi
-ffffffff80ef74d9:	ff 90 a8 01 00 00    	callq  *0x1a8(%rax)
-ffffffff80ef74df:	85 c0                	test   %eax,%eax
-ffffffff80ef74e1:	74 0e                	je     ffffffff80ef74f1 <ufs_itimes_locked+0x31>
-ffffffff80ef74e3:	41 80 66 48 f8       	andb   $0xf8,0x48(%r14)
-ffffffff80ef74e8:	48 83 c4 10          	add    $0x10,%rsp
-ffffffff80ef74ec:	5b                   	pop    %rbx
-ffffffff80ef74ed:	41 5e                	pop    %r14
-ffffffff80ef74ef:	5d                   	pop    %rbp
-ffffffff80ef74f0:	c3                   	retq   
-ffffffff80ef74f1:	41 8b 46 48          	mov    0x48(%r14),%eax
-ffffffff80ef74f5:	a8 07                	test   $0x7,%al
-ffffffff80ef74f7:	74 ef                	je     ffffffff80ef74e8 <ufs_itimes_locked+0x28>
-ffffffff80ef74f9:	8b 8b d8 01 00 00    	mov    0x1d8(%rbx),%ecx
-ffffffff80ef74ff:	83 c1 fd             	add    $0xfffffffffffffffd,%ecx
-ffffffff80ef7502:	48 8b 53 18          	mov    0x18(%rbx),%rdx
-ffffffff80ef7506:	83 f9 01             	cmp    $0x1,%ecx
-ffffffff80ef7509:	77 13                	ja     ffffffff80ef751e <ufs_itimes_locked+0x5e>
-ffffffff80ef750b:	48 b9 00 00 20 00 01 	mov    $0x100200000,%rcx
-ffffffff80ef7512:	00 00 00 
-ffffffff80ef7515:	48 85 8a 80 00 00 00 	test   %rcx,0x80(%rdx)
-ffffffff80ef751c:	74 1e                	je     ffffffff80ef753c <ufs_itimes_locked+0x7c>
-ffffffff80ef751e:	b9 08 00 00 00       	mov    $0x8,%ecx
-ffffffff80ef7523:	a8 06                	test   $0x6,%al
-ffffffff80ef7525:	75 1a                	jne    ffffffff80ef7541 <ufs_itimes_locked+0x81>
-ffffffff80ef7527:	be 00 00 00 18       	mov    $0x18000000,%esi
-ffffffff80ef752c:	23 72 78             	and    0x78(%rdx),%esi
-ffffffff80ef752f:	74 10                	je     ffffffff80ef7541 <ufs_itimes_locked+0x81>
-ffffffff80ef7531:	b9 40 00 00 00       	mov    $0x40,%ecx
-ffffffff80ef7536:	a8 01                	test   $0x1,%al
-ffffffff80ef7538:	75 07                	jne    ffffffff80ef7541 <ufs_itimes_locked+0x81>
-ffffffff80ef753a:	eb 0b                	jmp    ffffffff80ef7547 <ufs_itimes_locked+0x87>
-ffffffff80ef753c:	b9 20 00 00 00       	mov    $0x20,%ecx
-ffffffff80ef7541:	09 c8                	or     %ecx,%eax
-ffffffff80ef7543:	41 89 46 48          	mov    %eax,0x48(%r14)
-ffffffff80ef7547:	48 8d 7d e0          	lea    -0x20(%rbp),%rdi
-ffffffff80ef754b:	e8 a0 64 da ff       	callq  ffffffff80c9d9f0 <vfs_timestamp>
-
+; if (ip->i_flag & IN_ACCESS) {
 ffffffff80ef7550:	41 8b 4e 48          	mov    0x48(%r14),%ecx
 ffffffff80ef7554:	f6 c1 01             	test   $0x1,%cl
 ffffffff80ef7557:	74 3b                	je     ffffffff80ef7594 <ufs_itimes_locked+0xd4>
 ffffffff80ef7559:	48 8b 45 e0          	mov    -0x20(%rbp),%rax
 ffffffff80ef755d:	f7 c1 00 04 00 00    	test   $0x400,%ecx
+; DIP_SET(ip, i_atime, ts.tv_sec);
 ffffffff80ef7563:	75 09                	jne    ffffffff80ef756e <ufs_itimes_locked+0xae>
 ffffffff80ef7565:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef7569:	89 41 10             	mov    %eax,0x10(%rcx)
@@ -63,6 +13,7 @@ ffffffff80ef756e:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef7572:	48 89 41 20          	mov    %rax,0x20(%rcx)
 ffffffff80ef7576:	41 f6 46 49 04       	testb  $0x4,0x49(%r14)
 ffffffff80ef757b:	8b 45 e8             	mov    -0x18(%rbp),%eax
+; DIP_SET(ip, i_atimensec, ts.tv_nsec);
 ffffffff80ef757e:	75 0a                	jne    ffffffff80ef758a <ufs_itimes_locked+0xca>
 ffffffff80ef7580:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef7584:	48 83 c1 14          	add    $0x14,%rcx
@@ -70,12 +21,15 @@ ffffffff80ef7588:	eb 08                	jmp    ffffffff80ef7592 <ufs_itimes_lock
 ffffffff80ef758a:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef758e:	48 83 c1 44          	add    $0x44,%rcx
 ffffffff80ef7592:	89 01                	mov    %eax,(%rcx)
+; }
+
+; if (ip->ip_flag & IN_UPDATE) {
 ffffffff80ef7594:	41 8b 4e 48          	mov    0x48(%r14),%ecx
 ffffffff80ef7598:	f6 c1 04             	test   $0x4,%cl
-ffffffff80ef759b:	74 37                	je     ffffffff80ef75d4 <ufs_itimes_locked+0x114
->
+ffffffff80ef759b:	74 37                	je     ffffffff80ef75d4 <ufs_itimes_locked+0x114>
 ffffffff80ef759d:	48 8b 45 e0          	mov    -0x20(%rbp),%rax
 ffffffff80ef75a1:	f7 c1 00 04 00 00    	test   $0x400,%ecx
+; DIP_SET(ip, i_mtime, ts.tv_sec);
 ffffffff80ef75a7:	75 09                	jne    ffffffff80ef75b2 <ufs_itimes_locked+0xf2>
 ffffffff80ef75a9:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef75ad:	89 41 18             	mov    %eax,0x18(%rcx)
@@ -84,42 +38,46 @@ ffffffff80ef75b2:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef75b6:	48 89 41 28          	mov    %rax,0x28(%rcx)
 ffffffff80ef75ba:	41 f6 46 49 04       	testb  $0x4,0x49(%r14)
 ffffffff80ef75bf:	8b 45 e8             	mov    -0x18(%rbp),%eax
+; DIP_SET(ip, i_mtimensec, ts.tv_nsec);
 ffffffff80ef75c2:	75 09                	jne    ffffffff80ef75cd <ufs_itimes_locked+0x10d>
 ffffffff80ef75c4:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef75c8:	89 41 1c             	mov    %eax,0x1c(%rcx)
 ffffffff80ef75cb:	eb 07                	jmp    ffffffff80ef75d4 <ufs_itimes_locked+0x114>
 ffffffff80ef75cd:	49 8b 4e 38          	mov    0x38(%r14),%rcx
 ffffffff80ef75d1:	89 41 40             	mov    %eax,0x40(%rcx)
+; }
+
+; if (ip->i_flag & IN_CHANGE) {
 ffffffff80ef75d4:	41 8b 4e 48          	mov    0x48(%r14),%ecx
 ffffffff80ef75d8:	f6 c1 02             	test   $0x2,%cl
 ffffffff80ef75db:	0f 84 02 ff ff ff    	je     ffffffff80ef74e3 <ufs_itimes_locked+0x23>
-
 ffffffff80ef75e1:	48 8b 45 e0          	mov    -0x20(%rbp),%rax
 ffffffff80ef75e5:	f7 c1 00 04 00 00    	test   $0x400,%ecx
+; DIP_SET(ip, i_ctime, ts.tv_sec);
 ffffffff80ef75eb:	75 09                	jne    ffffffff80ef75f6 <ufs_itimes_locked+0x136>
-ffffffff80ef75ed:	49 8b 4e 38          	mov    0x38(%r14),%rcx
-ffffffff80ef75f1:	89 41 20             	mov    %eax,0x20(%rcx)
+*> ffffffff80ef75ed:	49 8b 4e 38          	mov    0x38(%r14),%rcx
+*> ffffffff80ef75f1:	89 41 20             	mov    %eax,0x20(%rcx)
 ffffffff80ef75f4:	eb 08                	jmp    ffffffff80ef75fe <ufs_itimes_locked+0x13e>
-DIP> ffffffff80ef75f6:	49 8b 4e 38          	mov    0x38(%r14),%rcx
-DIP> ffffffff80ef75fa:	48 89 41 30          	mov    %rax,0x30(%rcx)
+*> ffffffff80ef75f6:	49 8b 4e 38          	mov    0x38(%r14),%rcx
+*> ffffffff80ef75fa:	48 89 41 30          	mov    %rax,0x30(%rcx)
 ffffffff80ef75fe:	41 f6 46 49 04       	testb  $0x4,0x49(%r14)
 ffffffff80ef7603:	8b 45 e8             	mov    -0x18(%rbp),%eax
+; DIP_SET(ip, i_ctimensec, ts.tv_nsec);
+; DIP_SET(ip, i_modrev, DIP(ip, i_modrev) + 1);
 ffffffff80ef7606:	75 1f                	jne    ffffffff80ef7627 <ufs_itimes_locked+0x167>
-DIP> ffffffff80ef7608:	49 8b 4e 38          	mov    0x38(%r14),%rcx
-DIP> ffffffff80ef760c:	89 41 24             	mov    %eax,0x24(%rcx)
+*> ffffffff80ef7608:	49 8b 4e 38          	mov    0x38(%r14),%rcx
+*> ffffffff80ef760c:	89 41 24             	mov    %eax,0x24(%rcx)
 ffffffff80ef760f:	41 f6 46 49 04       	testb  $0x4,0x49(%r14)
 ffffffff80ef7614:	74 1f                	je     ffffffff80ef7635 <ufs_itimes_locked+0x175>
 ffffffff80ef7616:	49 8b 46 38          	mov    0x38(%r14),%rax
 ffffffff80ef761a:	48 83 80 e8 00 00 00 	addq   $0x1,0xe8(%rax)
 ffffffff80ef7621:	01 
 ffffffff80ef7622:	e9 bc fe ff ff       	jmpq   ffffffff80ef74e3 <ufs_itimes_locked+0x23>
-DIP> ffffffff80ef7627:	49 8b 4e 38          	mov    0x38(%r14),%rcx
-DIP> ffffffff80ef762b:	89 41 48             	mov    %eax,0x48(%rcx)
+*> ffffffff80ef7627:	49 8b 4e 38          	mov    0x38(%r14),%rcx
+*> ffffffff80ef762b:	89 41 48             	mov    %eax,0x48(%rcx)
 ffffffff80ef762e:	41 f6 46 49 04       	testb  $0x4,0x49(%r14)
 ffffffff80ef7633:	75 e1                	jne    ffffffff80ef7616 <ufs_itimes_locked+0x156>
-DIP> ffffffff80ef7635:	49 8b 46 38          	mov    0x38(%r14),%rax
+*> ffffffff80ef7635:	49 8b 46 38          	mov    0x38(%r14),%rax
 ffffffff80ef7639:	48 83 40 78 01       	addq   $0x1,0x78(%rax)
 ffffffff80ef763e:	e9 a0 fe ff ff       	jmpq   ffffffff80ef74e3 <ufs_itimes_locked+0x23>
-ffffffff80ef7643:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-ffffffff80ef764a:	00 00 00 
-ffffffff80ef764d:	0f 1f 00             	nopl   (%rax)
+; }
