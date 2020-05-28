@@ -11,7 +11,9 @@ Access and modification updates are relatively straightforward to patch. We can 
 Hiding change time is a little more tricky. The method I chose to use deviates heavily from the one used in the book. I spent a lot of time trying to annotate the disassembly [`ufs_itimes_locked`](./ufs_itimes_locked.asm), but ultimately I decided it would be easier to just patch the IF statement so that the check always fails.
 
 At address `0xffffffff80ef75d8` is the following instruction:
+
 |`f6 c1 02`|`test $0x02,%cl`|
+
 which checks the lower 16 bits of `rax` to see if the `IN_CHANGE` flag is set for the current inode (see [`ufs/ufs/inode.h`](https://github.com/freebsd/freebsd/blob/9f6817ff4b760f99399e808d0206b9262ec04bde/sys/ufs/ufs/inode.h#L123) and [`ufs/ufs/ufs_vnops.c`](https://github.com/freebsd/freebsd/blob/3fc1420eac76eb8ddf28d6b0715b2f2fe933f805/sys/ufs/ufs/ufs_vnops.c#L174)). Simply patching `0x02` to `0x00` will cause the change time to no longer be updated.
 
 To use:
