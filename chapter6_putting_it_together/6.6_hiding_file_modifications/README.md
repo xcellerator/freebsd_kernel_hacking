@@ -8,7 +8,7 @@ The last issue with our rootkit is that we will still leave traces when we copy 
 
 Access and modification updates are relatively straightforward to patch. We can just use `stat()` to get the current filesystem information, store the results in a `timeval` structure, do what we need to do in `/sbin/` and then finally restore the timestamps with `utimes()`.
 
-Hiding change time is a little more tricky. The method I chose to use deviates heavily from the one used in the book. I spent a lot of time trying to annotate the disassembly [`ufs_itimes_locked`](./ufs_itimes_locked.asm), but ultimately I decided it would be easier to just patch the IF statement so that the check always fails.
+Hiding change time is a little more tricky. The method I chose to use deviates heavily from the one used in the book. I spent a lot of time trying to annotate the disassembly [`ufs_itimes_locked`](./ufs_itimes_locked.asm) from [`ufs/ufs/ufs_vnops.c`](https://github.com/freebsd/freebsd/blob/3fc1420eac76eb8ddf28d6b0715b2f2fe933f805/sys/ufs/ufs/ufs_vnops.c#L166), but ultimately I decided it would be easier to just patch the IF statement so that the check always fails.
 
 At address `0xffffffff80ef75d8` is the following instruction:
 
