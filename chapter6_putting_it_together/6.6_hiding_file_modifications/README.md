@@ -12,6 +12,8 @@ Hiding change time is a little more tricky. The method I chose to use deviates h
 
 At address `0xffffffff80ef75d8` is the following instruction:
 
+|Bytes|Assembly|
+|-|-|
 |`f6 c1 02`|`test $0x02,%cl`|
 
 which checks the lower 16 bits of `rax` to see if the `IN_CHANGE` flag is set for the current inode (see [`ufs/ufs/inode.h`](https://github.com/freebsd/freebsd/blob/9f6817ff4b760f99399e808d0206b9262ec04bde/sys/ufs/ufs/inode.h#L123) and [`ufs/ufs/ufs_vnops.c`](https://github.com/freebsd/freebsd/blob/3fc1420eac76eb8ddf28d6b0715b2f2fe933f805/sys/ufs/ufs/ufs_vnops.c#L174)). Simply patching `0x02` to `0x00` will cause the change time to no longer be updated.
